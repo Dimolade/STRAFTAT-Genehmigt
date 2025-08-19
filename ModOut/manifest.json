@@ -1,0 +1,7 @@
+{
+  "name": "Genehmigt",
+  "version_number": "1.0.3",
+  "website_url": "https://github.com/Dimolade/STRAFTAT-Genehmigt",
+  "description": "Simple STRAFTAT Library for adding new Stuff!",
+  "dependencies": ["BepInEx-BepInExPack-5.4.2100"]
+}
