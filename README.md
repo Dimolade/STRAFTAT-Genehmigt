@@ -37,8 +37,10 @@ To get the parent of the Mesh, you simply just need to get the child of a child.
 Transform MeshHolder = testWeapon.transform.GetChild(0).GetChild(0);
 ```
 <br>
+
 You can simply load an AssetBundle with a Mesh and parent it to the MeshHolder. <br>
 Like this: <br>
+
 ```cs
 MyAwesomeWeaponMesh.SetParent(MeshHolder);
 // here you should change its position, settings, stuff like that. (localPosition and stuff).
