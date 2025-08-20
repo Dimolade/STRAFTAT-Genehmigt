@@ -22,11 +22,13 @@ First, make a <b>GenehmigtWeapon</b> Instance. <br>
 GenehmigtWeapon GW = new GenehmigtWeapon();
 ````
 <br>
+
 Now you can edit the GenehmigtWeapon to you'r needs. <br>
-For Example, setting the Name. <br>
-````cs
+For Example, setting the Name.
+
+```cs
 GW.Name = "My Awesome Weapon";
-````
+```
 <br>
 
 ### Adding a Mesh
