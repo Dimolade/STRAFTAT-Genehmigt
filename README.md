@@ -23,7 +23,7 @@ GenehmigtWeapon GW = new GenehmigtWeapon();
 ````
 <br>
 Now you can edit the GenehmigtWeapon to you'r needs. <br>
-For Example, setting the Name:<br>
+For Example, setting the Name:
 ```cs
 GW.Name = "My Awesome Weapon";
 ```
