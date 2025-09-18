@@ -27,7 +27,7 @@ using Object = UnityEngine.Object;
 
 [assembly: StraftatMod(isVanillaCompatible: false)]
 
-[BepInPlugin("dimolade.libraries.Genehmigt", "Genehmigt", "1.0.0.0")]
+[BepInPlugin("dimolade.libraries.Genehmigt", "Genehmigt", "1.1.0.0")]
 public class GenehmigtLoader : BaseUnityPlugin
 {
     private void Awake()
@@ -64,6 +64,7 @@ public static class Genehmigt {
     public static Dictionary<string, GameObject> ModdedRandomWeaponPool;
     public static bool onlySpawnModded = false;
     public static List<GenehmigtWeapon> ModWeaponList = new List<GenehmigtWeapon>();
+    public static List<GenehmigtMap> ModMapList = new List<GenehmigtMap>();
     public static ManualLogSource Logger;
     public static string dllFolder;
 
@@ -223,6 +224,77 @@ public static class Genehmigt {
 
         return PropBase;
     }
+
+    // Map creation
+
+    public static void MakeMap(GenehmigtMap map)
+    {
+        ModMapList.Add(map);
+    }
+}
+
+// this.allMaps[j] = map;
+//			this.allMapsDict.Add(map.mapName, map);
+
+[HarmonyPatch(typeof(UnityEngine.SceneManagement.SceneManager))]
+internal static class SceneGetPatch
+{
+    [HarmonyPatch("GetSceneAt")]
+    [HarmonyPrefix]
+    public static bool AddMaps(int index, ref Scene __result) {
+        foreach (GenehmigtMap GM in Genehmigt.ModMapList)
+        {
+            if (GM.Index == index)
+            {
+                __result = GM.Scene;
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+[HarmonyPatch(typeof(MapsManager))]
+internal static class MapManPatch
+{
+    [HarmonyPatch("InitMaps")]
+    [HarmonyPostfix]
+    public static void AddMaps(MapsManager __instance) {
+        Map[] allMaps = new Map[(SceneManager.sceneCountInBuildSettings - 6)+Genehmigt.ModMapList.Count];
+        int i2 = 0;
+        for (int i = 0; i < __instance.allMaps.Length; i++)
+        {
+            allMaps[i] = __instance.allMaps[i];
+            i2 = i;
+        }
+        i2++; // current index
+        foreach (var reference in Genehmigt.ModMapList)
+        {
+            Genehmigt.Logger.LogInfo("Added Genehmigt Map to Maps: "+reference.Name);
+            Map map = new Map {
+				index = i2,
+				mapName = reference.Name,
+				isDlcExclusive = false,
+				isAltMap = reference.Name.ToLower().EndsWith("_alt"),
+				isSelected = false,
+				isUnlocked = true,
+				mapInstance = null
+			};
+            allMaps[i2] = map;
+            __instance.allMapsDict.Add(map.mapName, map);
+
+            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(__instance.mapInstance, __instance.standardMapParent.position, Quaternion.identity, __instance.standardMapParent);
+			map.mapInstance = gameObject.GetComponent<MapInstance>();
+			map.mapInstance.name = map.mapName;
+			map.mapInstance.selected = map.isSelected;
+			gameObject.SetActive(true);
+
+            reference.Index = i2;
+            i2++;
+        }
+        __instance.allMaps = allMaps;
+        __instance.SortMapsFromMapInstanceName();
+    }
 }
 
 // Add Weapons to Prefab Pool i dont even know
@@ -254,6 +326,18 @@ class ResourceLoadPatch
                 {
                     __result = (Object)GW.WeaponObject;
                     Genehmigt.Logger.LogInfo("Tried Loading Genehmigt Weapon with Name: "+GW.Name);
+                    return false;
+                }
+            }
+        }
+        else if (path.StartsWith("MapSprites/"))
+        {
+            foreach (GenehmigtMap GW in Genehmigt.ModMapList)
+            {
+                if (path == "MapSprites/"+GW.Name)
+                {
+                    __result = (Object)GW.Icon;
+                    Genehmigt.Logger.LogInfo("Tried Loading Genehmigt Map's Icon with Name: "+GW.Name);
                     return false;
                 }
             }
@@ -302,6 +386,14 @@ class ResourceLoadAllPatch
             __result = rl.ToArray();
         }
     }
+}
+
+public class GenehmigtMap
+{
+    public Scene Scene;
+    public Texture2D Icon;
+    public string Name;
+    public int Index = 0;
 }
 
 public class GenehmigtWeapon

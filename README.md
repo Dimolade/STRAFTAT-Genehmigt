@@ -31,6 +31,12 @@ GW.Name = "My Awesome Weapon";
 ```
 <br>
 
+Now, simply add the Weapon so that it gets added to STRAFTAT.
+
+```cs
+GameObject testWeapon = Genehmigt.CreateWeapon(GW);
+```
+<br>
 ### Adding a Mesh
 To get the parent of the Mesh, you simply just need to get the child of a child.
 ```cs
@@ -46,6 +52,7 @@ MyAwesomeWeaponMesh.SetParent(MeshHolder);
 // here you should change its position, settings, stuff like that. (localPosition and stuff).
 ```
 <b>NOTE:</b> Do NOT Instantiate any of these Prefabs. <br>
+<br>
 
 ### Programming a Weapon
 Wow, now you'r Gun is in the Game! What's that? You'r Gun doesn't pick up and instead gives out a Null Reference Exception? Not to worry, this is simply because STRAFTAT require's a Weapon class on the Weapon. (Weapon Root not MeshHolder) <br><br>
