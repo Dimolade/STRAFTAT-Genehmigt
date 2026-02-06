@@ -37,6 +37,7 @@ Now, simply add the Weapon so that it gets added to STRAFTAT.
 GameObject testWeapon = Genehmigt.CreateWeapon(GW);
 ```
 <br>
+
 ### Adding a Mesh
 To get the parent of the Mesh, you simply just need to get the child of a child.
 ```cs
